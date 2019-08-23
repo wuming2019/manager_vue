@@ -48,6 +48,8 @@ export default {
             .then((res) => {
             //   console.log(res)
               if (res.data.meta.status === 200) {
+                // 添加导航守卫，将token存储到本地
+                localStorage.setItem('manager_vue_token', res.data.data.token)
                 //   实现路由跳转
                 this.$router.push({ name: 'home' })
               } else {
