@@ -26,3 +26,12 @@ export const editUser = (data) => {
     data
   })
 }
+
+// 实现用户角色的分配
+export const grantUserRole = (data) => {
+  return axios({
+    url: `users/${data.id}/role`,
+    method: 'put',
+    data: { rid: data.rid }
+  })
+}
