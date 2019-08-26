@@ -347,7 +347,8 @@ export default {
               })
             }
           })
-          .catch(() => {
+          .catch((err) => {
+            console.log(err)
             this.$message({
               type: 'error',
               message: '删除失败'
