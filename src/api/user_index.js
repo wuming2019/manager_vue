@@ -35,3 +35,19 @@ export const grantUserRole = (data) => {
     data: { rid: data.rid }
   })
 }
+
+// 实现用户数据的删除
+export const delUserById = (id) => {
+  return axios({
+    url: `users/${id}`,
+    method: 'delete'
+  })
+}
+
+// 实现用户状态的设置
+export const updateUserState = (uid, type) => {
+  return axios({
+    url: `users/${uid}/state/${type}`,
+    method: 'put'
+  })
+}

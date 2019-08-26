@@ -14,6 +14,7 @@
         class="input-with-select"
         style="width:300px;margin-right:10px"
         @keydown.enter.native="init"
+        @input.native="init"
       >
         <el-button slot="append" icon="el-icon-search" @click="init"></el-button>
       </el-input>
@@ -27,7 +28,7 @@
       <el-table-column prop="mobile" label="电话"></el-table-column>
       <el-table-column label="用户状态">
         <template slot-scope="scope">
-          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949"></el-switch>
+          <el-switch v-model="scope.row.mg_state" active-color="#13ce66" inactive-color="#ff4949" @change="changeState(scope.row.id,scope.row.mg_state)"></el-switch>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="400">
@@ -39,7 +40,7 @@
             <el-button type="success" icon="el-icon-share"  @click="showGrantDialog(scope.row)"></el-button>
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="删除" placement="top">
-            <el-button type="warning" icon="el-icon-delete"></el-button>
+            <el-button type="warning" icon="el-icon-delete" @click="deluser(scope.row.id)"></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -124,7 +125,7 @@
 </template>
 
 <script>
-import { getAllUsers, addUser, editUser, grantUserRole } from '@/api/user_index.js'
+import { getAllUsers, addUser, editUser, grantUserRole, delUserById, updateUserState } from '@/api/user_index.js'
 import { getAllRoleList } from '@/api/role_index.js'
 export default {
   data () {
@@ -216,7 +217,7 @@ export default {
       // 1.修改参数
       this.userobj.pagenum = val
       // 2.重新请求
-      this.userobj.pagenum = val
+      this.init()
     },
     //   数据获取
     init () {
@@ -323,6 +324,66 @@ export default {
       } else {
         this.$message.error('请选择角色')
       }
+    },
+    // 根据id删除用户数据
+    deluser (id) {
+      this.$confirm('此操作将永久删除该用户，是否继续？', '删除提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delUserById(id)
+          .then(res => {
+            if (res.data.meta.status === 200) {
+              this.$message({
+                type: 'success',
+                message: '删除成功'
+              })
+              this.init()
+            } else {
+              this.$message({
+                type: 'error',
+                message: res.data.meta.msg
+              })
+            }
+          })
+          .catch(() => {
+            this.$message({
+              type: 'error',
+              message: '删除失败'
+            })
+          })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    // 修改用户状态
+    changeState (id, type) {
+      console.log(111)
+      updateUserState(id, type)
+        .then(res => {
+          if (res.data.meta.status === 200) {
+            this.$message({
+              type: 'success',
+              message: '修改状态成功'
+            })
+            this.init()
+          } else {
+            this.$message({
+              type: 'error',
+              message: 'res.data.meta.msg'
+            })
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'error',
+            message: '修改状态失败'
+          })
+        })
     }
   },
   mounted () {
