@@ -339,6 +339,11 @@ export default {
                 type: 'success',
                 message: '删除成功'
               })
+              // this.init()
+              // 需求：如果当前页经过这一次删除，没有任何数据了，那么应该自动跳转到上一页
+              // 业务：先删除再刷新，意味着如果这页真的只有一条数据，那么经过这一次
+              // 删除操作，在刷新之前，这一页还是有1条数据的
+              this.userobj.pagenum = Math.ceil((this.total - 1) / this.userobj.pagenum) < this.userobj.pagenum ? --this.userobj.pagenum : this.userobj.pagenum
               this.init()
             } else {
               this.$message({
