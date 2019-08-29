@@ -2,17 +2,17 @@
   <div class="home">
     <el-container>
       <el-aside width="200px">
-        <img src="../assets/logo.png" alt class="logo" />
+        <img src="../assets/logo.png" alt="" class="logo" />
         <el-menu
           :collapse="iscollapse"
           :router="true"
           :unique-opened="true"
-          :default-active="'1-3'"
           class="el-menu-vertical-demo"
           background-color="#545c64"
           text-color="#fff"
           active-text-color="#ffd04b"
         >
+        <!-- :default-active="'1-3'" -->
         <!-- index需要的是字符串格式，而item.id是数值，
         所以会有警告错误，那么我们应该将item.id转换为字符串 -->
           <el-submenu :index="''+item.id" v-for="item in menuList" :key="item.id">
@@ -20,7 +20,7 @@
               <i class="el-icon-location"></i>
               <span>{{item.authName}}</span>
             </template>
-            <el-menu-item :index="'/home/'+subitem.path" v-for="subitem in item.child" :key="subitem.id">
+            <el-menu-item :index="'/home/'+subitem.path" v-for="subitem in item.children" :key="subitem.id">
               <template slot="title">
                 <i class="el-icon-menu"></i>
                 <span>{{subitem.authName}}</span>
@@ -58,6 +58,7 @@ export default {
         console.log(res)
         if (res.data.meta.status === 200) {
           this.menuList = res.data.data
+          console.log(this.menuList)
         }
       })
   }
