@@ -13,81 +13,17 @@
           text-color="#fff"
           active-text-color="#ffd04b"
         >
-          <el-submenu index="1">
+        <!-- index需要的是字符串格式，而item.id是数值，
+        所以会有警告错误，那么我们应该将item.id转换为字符串 -->
+          <el-submenu :index="''+item.id" v-for="item in menuList" :key="item.id">
             <template slot="title">
               <i class="el-icon-location"></i>
-              <span>用户管理</span>
+              <span>{{item.authName}}</span>
             </template>
-            <el-menu-item index="/home/users">
+            <el-menu-item :index="'/home/'+subitem.path" v-for="subitem in item.child" :key="subitem.id">
               <template slot="title">
                 <i class="el-icon-menu"></i>
-                <span>用户列表</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>权限管理</span>
-            </template>
-            <el-menu-item index="/home/rights">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>权限列表</span>
-              </template>
-            </el-menu-item>
-            <el-menu-item index="/home/roles">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>角色列表</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
-          <el-submenu index="3">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>商品管理</span>
-            </template>
-            <el-menu-item index="3-1">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>商品列表</span>
-              </template>
-            </el-menu-item>
-            <el-menu-item index="3-2">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>分类参数</span>
-              </template>
-            </el-menu-item>
-            <el-menu-item index="3-3">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>商品分类</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
-          <el-submenu index="4">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>订单管理</span>
-            </template>
-            <el-menu-item index="/home/users">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>订单列表</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
-          <el-submenu index="5">
-            <template slot="title">
-              <i class="el-icon-location"></i>
-              <span>数据统计</span>
-            </template>
-            <el-menu-item index="/home/users">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>数据列表</span>
+                <span>{{subitem.authName}}</span>
               </template>
             </el-menu-item>
           </el-submenu>
@@ -108,11 +44,22 @@
 </template>
 
 <script>
+import { getLeftMenu } from '@/api/right_index.js'
 export default {
   data () {
     return {
-      iscollapse: false
+      iscollapse: false,
+      menuList: []
     }
+  },
+  mounted () {
+    getLeftMenu()
+      .then(res => {
+        console.log(res)
+        if (res.data.meta.status === 200) {
+          this.menuList = res.data.data
+        }
+      })
   }
 }
 </script>

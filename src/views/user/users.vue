@@ -231,6 +231,8 @@ export default {
           } else if (res.data.meta.status === 400) {
             this.$message.error(res.data.meta.msg)
             this.$router.push({ name: 'login' })
+          } else if (res.data.meta.status === 401) {
+            this.$message.error(res.data.meta.msg)
           }
         })
         .catch(err => {

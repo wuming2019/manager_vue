@@ -7,7 +7,7 @@
       <el-breadcrumb-item>角色列表</el-breadcrumb-item>
     </el-breadcrumb>
     <!-- 按钮添加 -->
-    <el-button type="success">角色列表</el-button>
+    <el-button type="success" @click="showAddDialog">添加角色</el-button>
     <!-- 表格 -->
     <el-table :data="roleList" border style="width: 100%;margin-top: 15px">
       <el-table-column type="expand">
@@ -85,15 +85,40 @@
         <el-button type="primary" @click="grantRole">确 定</el-button>
       </div>
     </el-dialog>
+    <!-- 添加角色对话框 -->
+    <el-dialog title="添加角色" :visible.sync="adddialogFormVisible">
+      <el-form :model="form" :label-width="'80px'">
+        <el-form-item label="角色名称">
+          <el-input v-model="addForm.roleName" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="角色描述">
+          <el-input v-model="addForm.roleDesc" auto-complete="off"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="adddialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="addRole">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getAllRoleList, delRightByRoleId, grantRoleById } from '@/api/role_index.js'
+import {
+  getAllRoleList,
+  delRightByRoleId,
+  grantRoleById,
+  addRole
+} from '@/api/role_index.js'
 import { getAllRightList } from '@/api/right_index.js'
 export default {
   data () {
     return {
+      addForm: {
+        roleName: '',
+        roleDesc: ''
+      },
+      adddialogFormVisible: false,
       roleId: '',
       cnt: 0,
       defaultProps: {
@@ -216,7 +241,32 @@ export default {
           this.roleList = res.data.data
         }
       })
+    },
+    async addRole () {
+      try {
+        // 只能捕获主线程中的异常
+        // 尝试进行执行的代码块
+        let res = await addRole(this.addForm)
+        console.log(res)
+        if (res.data.meta.status === 201) {
+          this.$message.success(res.data.meta.msg)
+          this.adddialogFormVisible = false
+          this.init()
+        } else {
+          this.$message.error(res.data.meta.msg)
+        }
+      } catch (exp) {
+        this.$message.error('服务器异常')
+      } finally {
+        // 无论操作是否有错都会执行的代码块
+        // alert(456)
+      }
+    },
+    showAddDialog () {
+      this.adddialogFormVisible = true
     }
+    // 打开角色对话框
+
   },
   mounted () {
     this.init()
