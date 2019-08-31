@@ -16,9 +16,9 @@
     </el-steps>
     <el-card class="box-card">
       <!-- 表单 -->
-      <el-form label-width="80px">
+      <el-form label-width="160px">
         <!-- 标签页 -->
-        <el-tabs v-model="activeName" tab-position="left">
+        <el-tabs v-model="activeName" tab-position="left"  @tab-click='handleClick' :before-leave='beforeLeave'>
           <el-tab-pane label="基本信息" name="0">
             <el-form-item label="商品名称">
               <el-input v-model="goodsForm.goods_name"></el-input>
@@ -41,7 +41,39 @@
               ></el-cascader>
             </el-form-item>
           </el-tab-pane>
-          <el-tab-pane label="商品参数" name="1">商品参数</el-tab-pane>
+          <el-tab-pane label="商品参数" name="1">
+            <el-checkbox-group
+              v-model="item.attr_vals"
+              v-for="item in attrValues"
+              :key="item.attr_id"
+            >
+              <el-checkbox
+                border
+                :label="subitem"
+                v-for="(subitem,index) in item.attr_vals"
+                :key="index"
+              ></el-checkbox>
+            </el-checkbox-group>
+          </el-tab-pane>
+          <el-tab-pane label="商品属性" name="2">
+            <el-form-item :label="item.attr_name" v-for='item in staticValues' :key='item.attr_id'>
+              <el-input :value='item.attr_vals' readonly></el-input>
+            </el-form-item>
+          </el-tab-pane>
+          <el-tab-pane label="商品图片" name="3">
+            <el-upload
+              class="upload-demo"
+              :headers="setToken()"
+              action="http://localhost:8888/api/private/v1/upload"
+              :on-preview="handlePreview"
+              :on-remove="handleRemove"
+              :on-success="handleSuccess"
+              :before-upload="beforeUpload"
+              :file-list="fileList"
+              list-type="picture"
+              accept="image/gif, image/jpeg">
+            </el-upload>
+          </el-tab-pane>
           <el-tab-pane label="商品属性" name="2">商品属性</el-tab-pane>
           <el-tab-pane label="商品图片" name="3">
           <!-- token值一定要传递，并且是通过请求头进行设置，
@@ -63,7 +95,7 @@
           </el-upload>
           </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">
-            <quillEditor v-model='goodsForm.goods_introduce'></quillEditor>
+            <quillEditor v-model="goodsForm.goods_introduce"></quillEditor>
           </el-tab-pane>
         </el-tabs>
         <!-- 按钮 -->
@@ -78,9 +110,13 @@ import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import { getAllCateList } from '@/api/cate_index.js'
+import { getAllParamsList } from '@/api/params_index.js'
 export default {
   data () {
     return {
+      // checkList: [],
+      attrValues: [], // 动态参数数组，它应该是一个对象数组，包含着所有组的参数数据
+      staticValues: [],
       cateList: [],
       cascadeProps: {
         label: 'cat_name',
@@ -153,11 +189,41 @@ export default {
     },
     addGoods () {
       console.log(this.goodsForm)
-    }
+    },
     // getcate (obj) {
     //   console.log(obj)
     //   this.goodsForm.goods_cat = obj.join(',')
     // }
+    // 标签页跳转之前触发的钩子
+    beforeLeave (activeName, oldActiveName) {
+      if (activeName === '1' || activeName === '2') {
+        if (this.goodsForm.goods_cat.length !== 3) {
+          this.$message.warning('请先选择分类')
+          this.activeName = '0'
+          return false
+        }
+      }
+    },
+    // 处理标签页的单击，获取参数数据
+    async handleClick () {
+      // 如果activeName为1，那么应该获取动态数据，如果activeName为2，应该获取静态数据
+      if (this.activeName === '1') {
+        let res = await getAllParamsList(this.goodsForm.goods_cat[2], 'many')
+        this.attrValues = res.data.data
+        // console.log(res.data.data)
+        // 将数组里面的成员进行遍历，并将成员的attr_vals转换为数组
+        for (var i = 0; i < this.attrValues.length; i++) {
+          this.attrValues[i].attr_vals = this.attrValues[i].attr_vals.split(
+            ','
+          )
+        }
+        console.log(this.attrValues)
+      } else if (this.activeName === '2') {
+        let res = await getAllParamsList(this.goodsForm.goods_cat[2], 'only')
+        console.log(res)
+        this.staticValues = res.data.data
+      }
+    }
   },
   mounted () {
     getAllCateList(3)
