@@ -99,7 +99,8 @@
           </el-tab-pane>
         </el-tabs>
         <!-- 按钮 -->
-        <el-button type="primary" @click="addGoods">添加商品</el-button>      </el-form>
+        <el-button type="primary" @click="addGoods" style="float:right;margin-top:50px">添加商品</el-button>
+      </el-form>
     </el-card>
   </div>
 </template>
@@ -111,6 +112,7 @@ import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import { getAllCateList } from '@/api/cate_index.js'
 import { getAllParamsList } from '@/api/params_index.js'
+import { addGoods } from '@/api/goods_index.js'
 export default {
   data () {
     return {
@@ -187,8 +189,31 @@ export default {
     handlePreview (file) {
       console.log(file)
     },
-    addGoods () {
+    async addGoods () {
+      // 遍历组
+      for (var i = 0; i < this.attrValues.length; i++) {
+        let id = this.attrValues[i].attr_id
+        for (var j = 0; j < this.attrValues[i].attr_vals.length; j++) {
+          // 遍历组中的参数数据
+          this.goodsForm.attrs.push({
+            attr_id: id,
+            attr_value: this.attrValues[i].attr_vals[j]
+          })
+        }
+      }
+      // 处理分类数据
+      this.goodsForm.goods_cat = this.goodsForm.goods_cat.join(',')
       console.log(this.goodsForm)
+      let res = await addGoods(this.goodsForm)
+      console.log(res)
+      if (res.data.meta.status === 201) {
+        this.$message.success('添加商品成功')
+        this.$router.push({ name: 'list' })
+      }
+    // getcate (obj) {
+    //   console.log(obj)
+    //   this.goodsForm.goods_cat = obj.join(',')
+    // }
     },
     // getcate (obj) {
     //   console.log(obj)

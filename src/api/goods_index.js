@@ -8,3 +8,12 @@ export const getAllGoodsList = (params) => {
     params
   })
 }
+
+// 2.实现商品的添加
+export const addGoods = (data) => {
+  return axios({
+    url: 'goods',
+    method: 'post',
+    data
+  })
+}

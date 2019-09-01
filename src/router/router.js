@@ -10,6 +10,7 @@ import RoleList from '@/views/rights/roleList.vue'
 import Goods from '@/views/goods/goods.vue'
 import List from '@/views/goods/list.vue'
 import Add from '@/views/goods/add.vue'
+import Reports from '@/views/reports.vue'
 Vue.use(VueRouter)
 
 // 创建路由对象
@@ -35,6 +36,11 @@ export default new VueRouter({
           name: 'welcome',
           path: 'welcome',
           component: Welcome
+        },
+        {
+          name: 'reports',
+          path: 'reports',
+          component: Reports
         },
         {
           name: 'users',
